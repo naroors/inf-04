@@ -1,114 +1,80 @@
 #include <iostream>
-#include <cstdlib>
 #include <ctime>
-#include <numeric>
+#include <cstdlib>
 
 using namespace std;
 
-class Tablica {
-    private:
-        int* dane;
-        int liczba_elementow;
-    
+class ArrayManager {
+    int *tablica;
+    int rozmiar;
+
     public:
-        Tablica(int rozmiar) {
-            if(rozmiar <= 0) {
-                cerr << "Blad: Rozmiar tablicy musi byc wiekszy od zera. Ustawiam na 10." << endl;
-                liczba_elementow = 10;
-            } else {
-                liczba_elementow = rozmiar;
-            }
-
-            dane = new int[liczba_elementow]; 
-
-            for (int i = 0; i < liczba_elementow; i++) {
-                dane[i] = rand() % 1000 + 1;
-            }
-            cout << "Tablica utworzona z " << liczba_elementow << " elementami." << endl;
-        }
-
-        ~Tablica() {
-            delete[] dane;
-            dane = nullptr;
-            cout << "Pamiec tablicy zostala zwolniona. " << endl;
-        }
-
-        void wyswietl() {
-            cout << "\n--- Wyswietlanie wszystkich elementow tablicy ---" << endl;
-            for (int i = 0; i < liczba_elementow; i++) {
-                cout << i << ": " << dane[i] << endl;
+        ArrayManager(int n) { // konstruktor
+            rozmiar = n;
+            tablica = new int[n];
+            srand(time(0));
+            for (int i = 0; i < rozmiar; i++) {
+                tablica[i] = rand() % 1000 + 1;
             }
         }
 
-        int wyszukaj(int wartosc) {
-            for (int i = 0; i < liczba_elementow; i++) {
-                if (dane[i] == wartosc) {
-                    return i;
-                }
+        ~ArrayManager() { // destruktor
+            delete[] tablica;
+        }
+
+        void showAll() {
+            for (int i = 0; i < rozmiar; i++) {
+                cout << i << ": " << tablica[i] << endl;
+            }
+        }
+
+        int findValue(int x) {
+            for (int i = 0; i < rozmiar; i++) {
+                if (tablica[i] == x) return i;
             }
             return -1;
         }
 
-        int wyswietl_nieparzyste() {
-            int licznik_nieparzystych = 0;
-            cout << "\n--- Wyswietlanie wartosci nieparzystych ---" << endl;
-
-            cout << "wartosci nieparzyste ";
-            for (int i = 0; i < liczba_elementow; i++){ 
-                if (dane[i] % 2 != 0) {
-                    cout << dane[i] << " ";
-                    licznik_nieparzystych++;
+        int showOdd() {
+            int count = 0;
+            for (int i = 0; i < rozmiar; i++) {
+                if (tablica[i] % 2) {
+                    cout << tablica[i] << endl;
+                    count++;
                 }
             }
-
-            cout << endl;
-
-            return licznik_nieparzystych;
+            return count;
         }
 
-        double licz_srednia() {
-            if (liczba_elementow == 0) {
-                return 0.0;
+        int average() {
+            int sum = 0;
+            for (int i = 0; i < rozmiar; i++) {
+                sum += tablica[i];
             }
-
-            long long suma = 0;
-            for (int i = 0; i < liczba_elementow; i++) {
-                suma += dane[i];
-            }
-
-            return static_cast<double>(suma) / liczba_elementow;
+            return sum/rozmiar;
         }
+
 };
 
 int main() {
-    srand(time(0));
+    int n = 21;
+    ArrayManager arr(n);
 
-    Tablica mojaTablica(25);
+    cout << "Wszystkie elementy: " << endl;
+    arr.showAll();
 
-    mojaTablica.wyswietl();
+    int szukana;
+    cout << "Wpisz liczbe do wyszukania: " << endl;
+    cin >> szukana;
+    int idx = arr.findValue(szukana); // sprawdzenie na ktorym miejscu sie znajduje
+    if(idx != -1) cout << "Znaleziono na pozycji: " << idx << endl;
+    else cout << "Nie znaleziono wsrod wylosowaych." << endl;
 
-    int szukanaWartosc1 = rand() % 1000 + 1;
-    cout << "\n--- Wyszukiwanie wartosci: " << szukanaWartosc1 << " ---" << endl;
-     int indeks1 = mojaTablica.wyszukaj(szukanaWartosc1);
-    if (indeks1 != -1) {
-        cout << "Znaleziono wartosc " << szukanaWartosc1 << " na indeksie: " << indeks1 << endl;
-    } else {
-        cout << "Wartosc " << szukanaWartosc1 << " nie zostala znaleziona w tablicy." << endl;
-    }
+    cout << "Liczby nieparzyste: " << endl;
+    int count = arr.showOdd();
+    cout << "Razem nieparzystych: " << count << endl;
+    cout << "Srednia wszystkich elementow: " << arr.average() << endl;
 
-    int szukanaWartosc2 = 9999;
-    cout << "\n--- Wyszukiwanie wartosci: " << szukanaWartosc2 << " ---" << endl;
-    int indeks2 = mojaTablica.wyszukaj(szukanaWartosc2);
-    if (indeks2 != -1) {
-        cout << "Znaleziono wartosc " << szukanaWartosc2 << " na indeksie: " << indeks2 << endl;
-    } else {
-        cout << "wartosc " << szukanaWartosc2 << " nie zostala znaleziona w tablicy." << endl;
-    }
 
-    int iloscNieparzystych = mojaTablica.wyswietl_nieparzyste();
-    cout << "Laczna liczba wartosci nieparzystych: " << iloscNieparzystych << endl;
-
-    double srednia = mojaTablica.licz_srednia();
-    cout << "\nSrednia arytmetyczna wszystkich wartosci w tablicy: " << srednia << endl;
     return 0;
 }
